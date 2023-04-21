@@ -1,10 +1,16 @@
 <template>
-  <input  :value="modelValue" @input="updateInput" class="input" type="text" :placeholder="placeholder">
+  <!-- <input  :value="modelValue" @input="updateInput" class="input" type="text" :placeholder="placeholder"> -->
+  <input  v-model="value" @input="updateInput" class="input" type="text" :placeholder="placeholder">
 </template>
 
 <script>
 export default {
   name: 'my-input',
+  data() {
+    return {
+      value: ''
+    }
+  },
   props: ['placeholder', 'modelValue'],
   methods: {
     updateInput(evt) {

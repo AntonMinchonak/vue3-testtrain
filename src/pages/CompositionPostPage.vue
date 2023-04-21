@@ -1,19 +1,25 @@
 
 <template>
   <div class="postsPage" @scroll="scrolled">
+    <h1 @click="addLukes">{{lukes}}</h1>
     <PostForm /> 
-    <my-input placeholder="search" v-model="$store.state.postModule.search"></my-input>
-    <PostList  :posts="$store.getters.searchedPosts" />
+    <my-input placeholder="search" v-model="search"></my-input>
+   <my-select v-model="sort" :options='options'></my-select>
+   <PostList  :posts="searchedPosts" />
     <h4 v-if="$store.state.postModule.isDeleted">Post was succesfully deleted</h4>
     <h4 v-if="!$store.getters.searchedPosts.length">List is empty</h4>
     <!-- <div ref='scrollBorder' class="scroll-border"></div> -->
-    <div v-intersection class="scroll-border"></div>
+    <div v-intersection="{page, isLoading, usePosts}" class="scroll-border"></div>
   </div>
 </template>
 
 <script>
 import PostForm from '@/components/PostForm.vue'
 import PostList from '@/components/PostList.vue'
+import { ref } from 'vue';
+import usePosts from '@/hooks/usePosts'
+import useSortedPosts from '@/hooks/useSortedPosts'
+import useSearchedPosts from '@/hooks/useSearchedPosts'
 
 let timer;
 
@@ -34,6 +40,7 @@ export default {
       //   page: 0,
       //   limit: 10,
       //   isLoading: false
+      options: ['id', 'title', 'body']
     }
   },
   methods: {
@@ -89,7 +96,7 @@ export default {
 
   async mounted() {
     console.log(this.$store.state.postModule.posts);
-    this.$store.dispatch('fetchPosts')
+    // this.$store.dispatch('fetchPosts')
     //  console.log(this.$store.getters.doubleLikes)
     //  this.$store.commit('addLikes')
     //  console.log(this.$store.state.likes);
@@ -116,6 +123,15 @@ export default {
     // observer.observe(this.$refs.scrollBorder)
   },
 
+setup(props) {
+  const {posts, page, isLoading} = usePosts(10)
+  const {sortedPosts,sort} = useSortedPosts(posts)
+  const {search, searchedPosts} = useSearchedPosts(sortedPosts)
+
+  return {
+    posts,page,isLoading,searchedPosts,sortedPosts,search,sort
+  }
+}
 
 }
 
